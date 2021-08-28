@@ -10,6 +10,7 @@ from detector import Detector
 import itertools
 import math
 import time 
+import cv2
 
 class Processor(io.BytesIO):
     def __init__(self, detectors=None, callback=None, mask=None):
@@ -99,8 +100,8 @@ class SingleCore(Processor):
         if self.stop_event.is_set():
             raise StopIteration("Stop proccessing requested")
 
-        if params["verbose"] > 0:
-            e1 = time.time()
+        # if params["verbose"] > 0:
+        #     e1 = time.time()
 
         data = np.fromstring(b, dtype=np.uint8)
         self.image = np.resize(data,(params["resolution"][1], params["resolution"][0], 3))
@@ -110,21 +111,31 @@ class SingleCore(Processor):
         if self.callback:
             self.callback(self.centers)
         
-        if params['verbose']:
-            e2 = time.time()
-            elapsed_time = (e2 - e1)
+        # if params['verbose']:
+        #     e2 = time.time()
+        #     elapsed_time = (e2 - e1)
 
-            c = ", ".join(("({0:6.2f}, {1:6.2f})" if math.isnan(center[2]) else "({0:6.2f}, {1:6.2f}, {2:6.4f})").format(*center) if center else "None" for center in self.centers)
+        #     c = ", ".join(("({0:6.2f}, {1:6.2f})" if math.isnan(center[2]) else "({0:6.2f}, {1:6.2f}, {2:6.4f})").format(*center) if center else "None" for center in self.centers)
 
-            print('Frame: {:5}, center [{}], elapsed time: {:.1f}ms'.format(self.frame_number, c, elapsed_time*1000))
+        #     print('Frame: {:5}, center [{}], elapsed time: {:.1f}ms'.format(self.frame_number, c, elapsed_time*1000))
 
-        self.frame_number += 1
+        # self.frame_number += 1
 
     def processImage(self, image):
-        detector_results = [detector.processImage(self.frame_number, image) for detector in self.detectors]
-        # print(detector_results)
-        # merge results
-        centers = list(itertools.chain.from_iterable(detector_results))
+        # detector_results = [detector.processImage(self.frame_number, image) for detector in self.detectors]
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        gray = cv2.blur(gray,(10,10))
+        (minVal, maxVal, minLoc, maxLoc) = cv2.minMaxLoc(gray)
+        # print(gray.shape,maxLoc)
+        # print(gray[maxLoc[1],maxLoc[0]],maxLoc)
+        # detector_results[0] = (float(maxLoc[0]),float(maxLoc[1]),None)
+        # # print(detector_results)
+        # # merge results
+        # centers = list(itertools.chain.from_iterable(detector_results))
+        if gray[maxLoc[1],maxLoc[0]]>60:
+            centers = [(maxLoc[0],maxLoc[1],0)]
+        else:
+            centers = []
         return centers
 
 class MultiCore(Processor):

@@ -4,7 +4,7 @@ import find_object
 import multi_color_detector
 import io
 import numpy as np
-# import cv2
+import cv2
 import math
 import logging
 import warnings
@@ -562,7 +562,7 @@ class MultiColorDetector(HSVDetector):
     # necessary function - it initializes the RGB-HSV color table in the C program that is used for detection
     def init_table(self):
         multi_color_detector.init_table(
-            [ball.hsv_specs() for ball in self.balls])
+            [ball.hsv_specs_range() for ball in self.balls])
 
     def __init__(self, **kwargs):
         HSVDetector.__init__(self, **kwargs)

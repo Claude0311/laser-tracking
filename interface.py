@@ -89,7 +89,7 @@ def index(detector=None):
 
 @app.route('/centers')
 def centers():
-    print(app.processor.centers)
+    # print(app.processor.centers)
     # data = [None if math.isnan(x) else [None if math.isnan(
     #    y) else y for y in x] for x in app.processor.centers]
 
@@ -124,6 +124,7 @@ def config():
 @app.route('/config', methods=('POST',))
 def config_post():
     data = request.get_json()
+    print(data)
     app.params.update(data)
     return jsonify(dict(app.params))
 
