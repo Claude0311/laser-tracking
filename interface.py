@@ -92,9 +92,11 @@ def centers():
     # print(app.processor.centers)
     # data = [None if math.isnan(x) else [None if math.isnan(
     #    y) else y for y in x] for x in app.processor.centers]
-
-    data = [None if x is None else [None if math.isnan(
-        y) else y for y in x] for x in app.processor.centers]
+    try:
+        data = [None if x is None else [None if math.isnan(
+            y) else y for y in x] for x in app.processor.centers]
+    except:
+        data = []
     return jsonify(data)
 
 

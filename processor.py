@@ -123,16 +123,17 @@ class SingleCore(Processor):
 
     def processImage(self, image):
         # detector_results = [detector.processImage(self.frame_number, image) for detector in self.detectors]
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        gray = cv2.blur(gray,(10,10))
+        # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        gray = image[:,:,0]#-image[:,:,1]*0.5-image[:,:,2]*0.5
+        gray = cv2.blur(gray,(5,5))
         (minVal, maxVal, minLoc, maxLoc) = cv2.minMaxLoc(gray)
         # print(gray.shape,maxLoc)
-        # print(gray[maxLoc[1],maxLoc[0]],maxLoc)
+        print(gray[maxLoc[1],maxLoc[0]],maxLoc)
         # detector_results[0] = (float(maxLoc[0]),float(maxLoc[1]),None)
         # # print(detector_results)
         # # merge results
         # centers = list(itertools.chain.from_iterable(detector_results))
-        if gray[maxLoc[1],maxLoc[0]]>60:
+        if gray[maxLoc[1],maxLoc[0]]>0:
             centers = [(maxLoc[0],maxLoc[1],0)]
         else:
             centers = []
