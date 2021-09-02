@@ -128,7 +128,7 @@ class SingleCore(Processor):
         gray = cv2.blur(gray,(5,5))
         (minVal, maxVal, minLoc, maxLoc) = cv2.minMaxLoc(gray)
         # print(gray.shape,maxLoc)
-        print(gray[maxLoc[1],maxLoc[0]],maxLoc)
+        # print(gray[maxLoc[1],maxLoc[0]],maxLoc)
         # detector_results[0] = (float(maxLoc[0]),float(maxLoc[1]),None)
         # # print(detector_results)
         # # merge results

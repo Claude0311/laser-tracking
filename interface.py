@@ -128,6 +128,7 @@ def config_post():
     data = request.get_json()
     print(data)
     app.params.update(data)
+    app.processor.restart()
     return jsonify(dict(app.params))
 
 
@@ -150,12 +151,43 @@ def set_threshold(detector, threshold):
 
     return "Ok"
 
+@app.route('/camera')
+def takephoto(object=None, type=None):
+    tmpIso = app.camera.iso
+    app.camera.iso = 1000
+    time.sleep(1)
+    image = getImage(object, type)
+    if image is None:
+        abort(404)
+        return "Not loaded yet"
+    if len(image.shape) == 3:
+        # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        # _, buffer = cv2.imencode('.png', image)
+        pil_image = Image.fromarray(image)
+        byteIO = BytesIO()
+        pil_image.save(byteIO, format='PNG')
+    app.camera.iso = tmpIso
+    return responseImage(byteIO.getvalue())
+    # my_stream = BytesIO()
+    # tmpIso = app.camera.iso
+    # app.camera.iso = 1000
+    # # time.sleep(2)
+    # # app.camera.capture(my_stream, 'png')
+    # app.camera.capture(my_stream,format='png')
+    # # print('cap done',tmpIso)
+    # # print(my_stream)
+    # app.camera.iso = tmpIso
+
+    # # my_stream.seek(0)
+    # return responseImage(my_stream.getvalue())
+
 
 @app.route('/image')
 @app.route('/image/<object>')
 @app.route('/image/<object>/<type>')
 def image(object=None, type=None):
     image = getImage(object, type)
+    print(app.camera.iso)
     if image is None:
         abort(404)
         return "Not loaded yet"
